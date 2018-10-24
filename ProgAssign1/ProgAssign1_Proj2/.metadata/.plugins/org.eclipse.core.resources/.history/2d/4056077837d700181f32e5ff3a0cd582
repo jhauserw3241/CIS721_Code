@@ -136,6 +136,7 @@ functionality.
 
 /* Standard includes. */
 #include <stdint.h>
+#include <math.h>
 
 /* Kernel includes. */
 #include "stm32f4xx.h"
@@ -144,6 +145,7 @@ functionality.
 #include "../FreeRTOS_Source/include/semphr.h"
 #include "../FreeRTOS_Source/include/task.h"
 #include "../FreeRTOS_Source/include/timers.h"
+#include "stm32f4_discovery.h"
 
 /* Priorities at which the tasks are created.  The event semaphore task is
 given the maximum priority of ( configMAX_PRIORITIES - 1 ) to ensure it runs as
@@ -151,8 +153,6 @@ soon as the semaphore is given. */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
 #define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
 #define mainEVENT_SEMAPHORE_TASK_PRIORITY	( configMAX_PRIORITIES - 1 )
-
-#define mainBLINKTASK_PERIOD_MS				( 1000 / portTICK_RATE_MS)
 
 /* The rate at which data is sent to the queue, specified in milliseconds, and
 converted to ticks using the portTICK_RATE_MS constant. */
@@ -176,6 +176,7 @@ the queue empty. */
 static void prvSetupHardware( void );
 
 static void prvBlinkTask( void *pvParameters );
+static void CPU_work(int time);
 
 /*
  * The queue send and receive tasks as described in the comments at the top of
@@ -222,6 +223,18 @@ xTimerHandle xExampleSoftwareTimer = NULL;
 	can be done here if it was not done before main() was called. */
 	prvSetupHardware();
 
+	/* MLN Initialize LEDs and User_Button on STM32F4-Discovery */
+	STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
+
+	STM_EVAL_LEDInit(LED3);
+	STM_EVAL_LEDInit(LED4);
+	STM_EVAL_LEDInit(LED5);
+	STM_EVAL_LEDInit(LED6);
+	/* Turn on 2 LEDs available on STM32F4-Discovery */
+	STM_EVAL_LEDOn(LED3);
+	STM_EVAL_LEDOn(LED4);
+	STM_EVAL_LEDOff(LED5);
+	STM_EVAL_LEDOff(LED6);
 
 	/* Create the queue used by the queue send and queue receive tasks.
 	http://www.freertos.org/a00116.html */
@@ -327,6 +340,9 @@ const uint32_t ulValueToSend = 100UL;
 		time.  http://www.freertos.org/vtaskdelayuntil.html */
 		vTaskDelayUntil( &xNextWakeTime, mainQUEUE_SEND_PERIOD_MS );
 
+		STM_EVAL_LEDOn(LED5);
+		STM_EVAL_LEDOff(LED6);
+
 		/* Send to the queue - causing the queue receive task to unblock and
 		increment its counter.  0 is used as the block time so the sending
 		operation will not block - it shouldn't need to block as the queue
@@ -351,6 +367,9 @@ uint32_t ulReceivedValue;
 		is it the expected value?  If it is, increment the counter. */
 		if( ulReceivedValue == 100UL )
 		{
+			STM_EVAL_LEDOff(LED5);
+			STM_EVAL_LEDOn(LED6);
+
 			/* Count the number of items that have been received correctly. */
 			ulCountOfItemsReceivedOnQueue++;
 		}
@@ -468,24 +487,38 @@ static void prvSetupHardware( void )
 	main() was called. */
 }
 
+#define mainBLINKTASK_PERIOD_MS				( 1000 / portTICK_RATE_MS)
+
 static void prvBlinkTask(void *pvParameters)
 {
-	portTickType xNextWakeTime;
-	volatile int i = 0;
+	//portTickType xNextWakeTime;
 
 	/* Initialise xNextWakeTime - this only needs to be done once. */
-	xNextWakeTime = xTaskGetTickCount();
+	//xNextWakeTime = xTaskGetTickCount();
 
 	for( ;; )
 	{
-
 		STM_EVAL_LEDOn(LED3);
-		for (i = 0; i < 5000; i++) ;
+		CPU_work(900);
 
 		STM_EVAL_LEDOff(LED3);
-		for (i = 0; i < 500; i++) ;
+		CPU_work(100);
 
-		vTaskDelayUntil(&xNextWakeTime, mainBLINKTASK_PERIOD_MS);
+		//vTaskDelayUntil(&xNextWakeTime, mainBLINKTASK_PERIOD_MS);
 	}
+}
+
+#define maxIterations						(pow(2,31) - 1)
+#define iterationsPerMillisecond			(15000)
+
+/* Creates a busy wait for the number of milliseconds provided
+ *
+ * Params:
+ * time - number of milliseconds */
+static void CPU_work(int time) {
+	int i;
+	int requestedIterations = time * iterationsPerMillisecond;//portTICK_RATE_MS;//iterationsPerMillisecond;
+	int actualIterations = requestedIterations > maxIterations ? maxIterations : requestedIterations;
+	for(i = 0; i < actualIterations; i++) ;
 }
 
