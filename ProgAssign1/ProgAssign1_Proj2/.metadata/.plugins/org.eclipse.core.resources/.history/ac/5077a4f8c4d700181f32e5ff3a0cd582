@@ -252,7 +252,7 @@ xTimerHandle xExampleSoftwareTimer = NULL;
 
 	int* task1Params = (int *)malloc(sizeof(int)*3);
 	task1Params[0] = LED3;
-	task1Params[1] = 55;
+	task1Params[1] = 85;
 	task1Params[2] = 30;
 	/* Make the green light blink*/
 	xTaskCreate( 	prvBlinkTask,			/* The function that implements the task. */

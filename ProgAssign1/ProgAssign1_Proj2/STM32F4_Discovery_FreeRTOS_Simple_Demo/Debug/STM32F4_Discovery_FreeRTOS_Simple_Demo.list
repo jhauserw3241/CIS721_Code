@@ -9479,10 +9479,10 @@ xTimerHandle xExampleSoftwareTimer = NULL;
  800368a:	68bb      	ldr	r3, [r7, #8]
  800368c:	2201      	movs	r2, #1
  800368e:	601a      	str	r2, [r3, #0]
-	task1Params[1] = 85;
+	task1Params[1] = 55;
  8003690:	68bb      	ldr	r3, [r7, #8]
  8003692:	3304      	adds	r3, #4
- 8003694:	2255      	movs	r2, #85	; 0x55
+ 8003694:	2237      	movs	r2, #55	; 0x37
  8003696:	601a      	str	r2, [r3, #0]
 	task1Params[2] = 30;
  8003698:	68bb      	ldr	r3, [r7, #8]
