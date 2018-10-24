@@ -498,10 +498,10 @@ static void prvBlinkTask(void *pvParameters)
 	for( ;; )
 	{
 		STM_EVAL_LEDOn(led);
-		CPU_work(runTime);
+		CPU_work(500);
 
 		STM_EVAL_LEDOff(led);
-		vTaskDelay(period - runTime);
+		CPU_work(500);
 	}
 }
 

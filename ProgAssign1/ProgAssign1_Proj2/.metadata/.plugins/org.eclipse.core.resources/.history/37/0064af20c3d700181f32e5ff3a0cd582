@@ -501,7 +501,7 @@ static void prvBlinkTask(void *pvParameters)
 		CPU_work(runTime);
 
 		STM_EVAL_LEDOff(led);
-		vTaskDelay(period - runTime);
+		CPU_work(period - runTime);
 	}
 }
 

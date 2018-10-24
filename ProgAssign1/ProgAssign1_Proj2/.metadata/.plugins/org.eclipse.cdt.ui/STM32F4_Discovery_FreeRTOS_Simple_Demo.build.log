@@ -1,4 +1,4 @@
-12:06:37 **** Incremental Build of configuration Debug for project STM32F4_Discovery_FreeRTOS_Simple_Demo ****
+14:33:57 **** Incremental Build of configuration Debug for project STM32F4_Discovery_FreeRTOS_Simple_Demo ****
 Info: Internal Builder is used for build
 arm-atollic-eabi-gcc -c ..\src\main.c -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -std=gnu11 -DUSE_STM32F4_DISCOVERY -DHSE_VALUE=8000000 -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -I../src -I../Libraries/CMSIS/Include -I../Libraries/Device/STM32F4xx/Include -I../Libraries/STM32F4xx_StdPeriph_Driver/inc -I../Utilities/STM32F4-Discovery -I../FreeRTOS_Source/include -I../FreeRTOS_Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -specs=nano.specs -o src\main.o 
 ..\src\main.c: In function 'main':
@@ -22,12 +22,12 @@ C:\Program Files (x86)\Atollic\TrueSTUDIO for STM32 9.0.1\ide\jre\bin\java -jar 
 Generate build reports...
 Print size information
    text	   data	    bss	    dec	    hex	filename
-  15384	    152	   8776	  24312	   5ef8	STM32F4_Discovery_FreeRTOS_Simple_Demo.elf
+  15488	    152	   8776	  24416	   5f60	STM32F4_Discovery_FreeRTOS_Simple_Demo.elf
 Print size information done
 Generate listing file
 Output sent to: STM32F4_Discovery_FreeRTOS_Simple_Demo.list
 Generate listing file done
 Generate build reports done
 
-12:06:38 Build Finished (took 1s.219ms)
+14:33:58 Build Finished (took 1s.183ms)
 
