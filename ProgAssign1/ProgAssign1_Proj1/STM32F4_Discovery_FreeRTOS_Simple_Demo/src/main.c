@@ -258,36 +258,6 @@ xTimerHandle xExampleSoftwareTimer = NULL;
 					mainQUEUE_RECEIVE_TASK_PRIORITY,/* The priority to assign to the task.  tskIDLE_PRIORITY (which is 0) is the lowest priority.  configMAX_PRIORITIES - 1 is the highest priority. */
 					NULL );							/* Used to obtain a handle to the created task.  Not used in this simple demo, so set to NULL. */
 
-	/* Create the queue receive task as described in the comments at the top
-	of this	file.  http://www.freertos.org/a00125.html */
-	//TaskCreate( 	prvQueueReceiveTask,			/* The function that implements the task. */
-	//				"Rx", 		/* Text name for the task, just to help debugging. */
-	//				configMINIMAL_STACK_SIZE, 		/* The size (in words) of the stack that should be created for the task. */
-	//				NULL, 							/* A parameter that can be passed into the task.  Not used in this simple demo. */
-	//				mainQUEUE_RECEIVE_TASK_PRIORITY,/* The priority to assign to the task.  tskIDLE_PRIORITY (which is 0) is the lowest priority.  configMAX_PRIORITIES - 1 is the highest priority. */
-	//				NULL );							/* Used to obtain a handle to the created task.  Not used in this simple demo, so set to NULL. */
-
-
-	/* Create the queue send task in exactly the same way.  Again, this is
-	described in the comments at the top of the file. */
-	//xTaskCreate( 	prvQueueSendTask,
-	//				"TX",
-	//				configMINIMAL_STACK_SIZE,
-	//				NULL,
-	//				mainQUEUE_SEND_TASK_PRIORITY,
-	//				NULL );
-
-
-	/* Create the task that is synchronised with an interrupt using the
-	xEventSemaphore semaphore. */
-	//xTaskCreate( 	prvEventSemaphoreTask,
-	//				"Sem",
-	//				configMINIMAL_STACK_SIZE,
-	//				NULL,
-	//				mainEVENT_SEMAPHORE_TASK_PRIORITY,
-	//				NULL );
-
-
 	/* Create the software timer as described in the comments at the top of
 	this file.  http://www.freertos.org/FreeRTOS-timers-xTimerCreate.html. */
 	xExampleSoftwareTimer = xTimerCreate("LEDTimer", /* A text name, purely to help debugging. */
@@ -491,11 +461,6 @@ static void prvSetupHardware( void )
 
 static void prvBlinkTask(void *pvParameters)
 {
-	//portTickType xNextWakeTime;
-
-	/* Initialise xNextWakeTime - this only needs to be done once. */
-	//xNextWakeTime = xTaskGetTickCount();
-
 	for( ;; )
 	{
 		STM_EVAL_LEDOn(LED3);
@@ -503,8 +468,6 @@ static void prvBlinkTask(void *pvParameters)
 
 		STM_EVAL_LEDOff(LED3);
 		CPU_work(100);
-
-		//vTaskDelayUntil(&xNextWakeTime, mainBLINKTASK_PERIOD_MS);
 	}
 }
 
