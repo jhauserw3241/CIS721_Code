@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!ProgAssign1/ProgAssign1_Proj1/STM32F4_Discovery_FreeRTOS_Simple_Demo/src/main.c
+!ProgAssign1/ProgAssign1_Proj2/STM32F4_Discovery_FreeRTOS_Simple_Demo/src/main.c
+!ProgAssign1/ProgAssign1_Proj3/STM32F4_Discovery_FreeRTOS_Simple_Demo/src/main.c

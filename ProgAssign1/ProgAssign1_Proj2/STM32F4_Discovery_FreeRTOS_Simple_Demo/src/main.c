@@ -206,6 +206,11 @@ static xQueueHandle xQueue = NULL;
  */
 static xSemaphoreHandle xEventSemaphore = NULL;
 
+/* The semaphore (in this case binary) that is used by the FreeRTOS tick hook
+ * function and the event semaphore task.
+ */
+static xSemaphoreHandle xLedTaskSemaphore = NULL;
+
 /* The counters used by the various examples.  The usage is described in the
  * comments at the top of this file.
  */
@@ -250,28 +255,23 @@ xTimerHandle xExampleSoftwareTimer = NULL;
 	/* Add to the registry, for the benefit of kernel aware debugging. */
 	vQueueAddToRegistry( xEventSemaphore, "xEventSemaphore" );
 
-	int* task1Params = (int *)malloc(sizeof(int)*3);
-	task1Params[0] = LED3;
-	task1Params[1] = 55;
-	task1Params[2] = 30;
+	/* Attempt to create a semaphore for the LEDs. */
+	xSemaphore = xSemaphoreCreateBinary(xLedTaskSemaphore);
+
 	/* Make the green light blink*/
-	xTaskCreate( 	prvBlinkTask,			/* The function that implements the task. */
+	xTaskCreate( 	prvTask1,			/* The function that implements the task. */
 					"Blink #1", 		/* Text name for the task, just to help debugging. */
 					configMINIMAL_STACK_SIZE, 		/* The size (in words) of the stack that should be created for the task. */
-					(void *)task1Params,					/* A parameter that can be passed into the task.  Not used in this simple demo. */
+					NULL,					/* A parameter that can be passed into the task.  Not used in this simple demo. */
 					1,								/* The priority to assign to the task.  tskIDLE_PRIORITY (which is 0) is the lowest priority.  configMAX_PRIORITIES - 1 is the highest priority. */
 					NULL );							/* Used to obtain a handle to the created task.  Not used in this simple demo, so set to NULL. */
 
-	int* task2Params = (int *)malloc(sizeof(int)*3);
-	task2Params[0] = LED4;
-	task2Params[1] = 30;
-	task2Params[2] = 10;
 	/* Make the orange light blink*/
-	xTaskCreate( 	prvBlinkTask,			/* The function that implements the task. */
-					"Blink #2", 		/* Text name for the task, just to help debugging. */
+	xTaskCreate( 	prvTask3,			/* The function that implements the task. */
+					"Blink #3", 		/* Text name for the task, just to help debugging. */
 					configMINIMAL_STACK_SIZE, 		/* The size (in words) of the stack that should be created for the task. */
-					(void *)task2Params,			/* A parameter that can be passed into the task.  Not used in this simple demo. */
-					2,								/* The priority to assign to the task.  tskIDLE_PRIORITY (which is 0) is the lowest priority.  configMAX_PRIORITIES - 1 is the highest priority. */
+					NULL,			/* A parameter that can be passed into the task.  Not used in this simple demo. */
+					10,								/* The priority to assign to the task.  tskIDLE_PRIORITY (which is 0) is the lowest priority.  configMAX_PRIORITIES - 1 is the highest priority. */
 					NULL );							/* Used to obtain a handle to the created task.  Not used in this simple demo, so set to NULL. */
 
 	/* Create the software timer as described in the comments at the top of
@@ -474,26 +474,28 @@ static void prvSetupHardware( void )
 }
 
 #define mainBLINKTASK_PERIOD_MS				( 1000 / portTICK_RATE_MS)
+SemaphoreHandle_t xSemaphore;
 
-/* Create a blink task with the given information
- *
- * Params:
- * led - the number of the LED to use
- * period - the number of milliseconds of the period
- * runTime - the amount of time (in milliseconds) the LED should be on
- * */
-static void prvBlinkTask(void *pvParameters)
+/* Create task 1 */
+static void prvTask1(void *pvParameters)
+{
+	// Initialize values
+	int led = LED4;
+	int runTime = 20;
+
+	xSemaphoreTake(xLedTaskSemaphore, 1);
+	CPU_work(runTime);
+	STM_EVAL_LEDOff(led);
+	xSemaphoreGive(xLedTaskSemaphore);
+}
+
+/* Create task 2 */
+static void prvTask2(void *pvParameters)
 {
 	// Initialize values
 	int led = LED5;
-	int period = 0;
-	int runTime = 0;
-
-	// Get parameters
-	int* params = (int *)pvParameters;
-	led = params[0];
-	period = params[1];
-	runTime = params[2];
+	int period = 30;
+	int runTime = 10;
 
 	for( ;; )
 	{
@@ -502,6 +504,26 @@ static void prvBlinkTask(void *pvParameters)
 
 		STM_EVAL_LEDOff(led);
 		vTaskDelay(period - runTime);
+	}
+}
+
+/* Create task 3 */
+static void prvTask3(void *pvParameters)
+{
+	// Initialize values
+	int led = LED6;
+	int totalTime = 0;
+	int period = 85;
+
+	for( ;; )
+	{
+		totalTime = totalTime + period;
+
+		STM_EVAL_LEDOn(led);
+		xSemaphoreGive(xLedTaskSemaphore);
+		xSemaphoreTake(xLedTaskSemaphore, 1);
+
+		vTaskDelayUntil(totalTime);
 	}
 }
 
